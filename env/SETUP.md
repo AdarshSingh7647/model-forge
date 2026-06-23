@@ -24,8 +24,48 @@ This env is a **conda env**, Python **3.11.15**, **torch 2.6.0+cu124**.
 2. **Python 3.11** (use 3.11 to reuse all wheels, incl. flash-attn `cp311`).
 3. **torch 2.6.0+cu124** exactly (other pins assume this).
 4. **NVIDIA driver ≥ 550.54** (CUDA 12.4 capable).
-5. **Same GPU architecture family** ideally (this ran on A100 = `sm_80`).
-   flash-attn 2.8.x supports Ampere/Ada/Hopper; check your GPU is covered.
+5. **GPU architecture.** This was developed on A100 (`sm_80`); the new server
+   is **H200 (Hopper, `sm_90`)**. torch 2.6+cu124 and flash-attn 2.8.x both
+   support Hopper, so no version change is needed — but the flash-attn binary
+   must contain `sm_90` kernels (the official prebuilt wheel does; a build that
+   auto-detected an A100 would not — see below).
+
+## Quick start (one deterministic command)
+
+```bash
+bash env/setup_env.sh        # creates conda env "trainer", fully pinned
+conda activate trainer
+```
+
+`setup_env.sh` pins Python 3.11, torch 2.6.0+cu124, the full lockfile, and
+flash-attn 2.8.3 (prebuilt Hopper-capable wheel, with a source-build fallback
+pinned to `sm_90`), then installs LLaMA-Factory editable and verifies. Re-runs
+on any matching H200 host give the same env. The manual paths below are only if
+you want to do it step by step.
+
+> **Do not use `conda-pack` (Path A) for A100 → H200.** It would carry the
+> flash-attn compiled here, which may hold only `sm_80` kernels and fail on
+> Hopper with "no kernel image is available". Rebuild instead (the script does).
+
+## What if the new server's system CUDA is 12.6 (not 12.4)?
+
+**It does not matter — no rebuild needed.** The torch wheels bundle their own
+CUDA 12.4 runtime (the `nvidia-*-cu12` pip packages) and ignore the system CUDA
+toolkit at runtime. CUDA is backward compatible, so a server provisioned for
+CUDA 12.6 has a driver (≥ 560) newer than what CUDA 12.4 needs (≥ 550), and
+`torch 2.6.0+cu124` runs on it unchanged. Only the **driver** matters; the
+system `nvcc`/toolkit version is irrelevant unless you compile flash-attn.
+
+- Just run the cu124 env as-is (conda-pack Path A works straight onto a 12.6 box).
+- If you *want* the stack aligned to 12.6, install the cu126 build instead —
+  same torch version, and the **same flash-attn wheel** (`cu12torch2.6`) applies:
+  ```bash
+  pip install torch==2.6.0 torchvision==0.21.0 torchaudio==2.6.0 \
+    --index-url https://download.pytorch.org/whl/cu126
+  ```
+- Gotcha: if the host profile forces `/usr/local/cuda-12.6/lib64` onto
+  `LD_LIBRARY_PATH` and you see CUDA symbol errors, drop it from
+  `LD_LIBRARY_PATH` inside the env — torch loads its own bundled libs.
 
 ---
 
