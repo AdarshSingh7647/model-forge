@@ -1,0 +1,7 @@
+# Core deps for the helper scripts in this repo.
+# NOTE: LLaMA-Factory itself is installed separately (see README) and brings
+# torch / transformers / peft / accelerate with it.
+python-dotenv>=1.0
+huggingface_hub>=0.23
+transformers>=4.45
+pyyaml>=6.0

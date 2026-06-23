@@ -1,0 +1,28 @@
+# --- secrets ---
+.env
+
+# --- python ---
+__pycache__/
+*.py[cod]
+*.egg-info/
+.ipynb_checkpoints/
+
+# --- vendored third-party (installed separately, has its own git history) ---
+LLaMA-Factory/
+
+# --- model weights & training/eval runs (moved out-of-band, e.g. via Drive) ---
+lora_runs/
+eval_runs/
+
+# --- logs ---
+logs/
+
+# --- generated configs (regenerate with: python make_configs.py) ---
+configs/*.yaml
+
+# --- large / generated training data (moved out-of-band; rebuild with build_sft_data.py) ---
+training_data/
+
+# --- misc ---
+.DS_Store
+*.swp
