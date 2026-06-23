@@ -38,6 +38,7 @@ The Forge (model-forge/)
 ├── build_sft_data.py       # build the 4 sharegpt SFT setups (train = sharded folders)
 ├── shard_data.py           # split a JSON-array file into <100 MB shards
 ├── make_configs.py         # generate the 8 LLaMA-Factory LoRA configs
+├── fix_paths.sh            # rewrite absolute paths to this checkout (auto-run by the pipeline)
 ├── probe_memory.py         # measure peak GPU memory per (model, seq_len)
 ├── training_status.py      # live status across all runs
 ├── configs/run_all.sh      # sequentially launch the runs
@@ -73,6 +74,15 @@ python build_sft_data.py --llamafactory_data_dir LLaMA-Factory/data   # 2. data
 python make_configs.py                        # 3. 8 LoRA configs
 bash configs/run_all.sh                        # 4. train (auto-resumes from latest checkpoint)
 eval/run_eval.sh qwen3_8b_full_loss            # 5. predict + score
+```
+
+After **moving the repo / checkpoints to a new machine**, absolute paths in the
+generated files (`dataset_info.json`, `configs/*.yaml`) are realigned to the new
+location automatically — `configs/run_all.sh` and `eval/run_eval.sh` invoke
+`fix_paths.sh` on startup (idempotent). To realign without running anything else:
+
+```bash
+bash fix_paths.sh
 ```
 
 ## Data sharding

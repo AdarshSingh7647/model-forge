@@ -25,6 +25,10 @@ LOG_DIR="$ROOT/logs"
 # Load optional env (TRAINER_BIN, etc.) from the repo's .env if present.
 set -a; [ -f "$ROOT/.env" ] && . "$ROOT/.env"; set +a
 
+# Make all generated configs / dataset paths match THIS checkout (idempotent),
+# so a moved or freshly-cloned repo never fails on stale absolute paths.
+bash "$ROOT/fix_paths.sh"
+
 # Put the trainer venv first so `torchrun` and `llamafactory-cli` resolve to it
 # (only if TRAINER_BIN is set; otherwise rely on whatever is on PATH).
 if [ -n "${TRAINER_BIN:-}" ]; then export PATH="$TRAINER_BIN:$PATH"; fi

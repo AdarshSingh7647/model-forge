@@ -32,6 +32,9 @@ else
   PY="python"; CLI="llamafactory-cli"
 fi
 
+# Make generated configs / dataset paths match THIS checkout (idempotent).
+bash "$ROOT/fix_paths.sh"
+
 # Pin to ONE GPU so this stays single-process (no DDP) and does not collide with
 # a training job. Defaults to GPU 1 (training uses GPU 0); override by exporting
 # CUDA_VISIBLE_DEVICES before calling.
