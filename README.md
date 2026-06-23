@@ -49,12 +49,21 @@ The Forge (model-forge/)
 
 ## Setup
 
+The full training stack (conda + torch + flash-attn + LLaMA-Factory) is built by
+one pinned command — see [env/SETUP.md](env/SETUP.md) for details and the
+H200 / CUDA-12.6 notes:
+
 ```bash
-cp .env.example .env        # then fill in HF_KEY + paths
-pip install -r requirements.txt   # or your existing trainer env
+# 0. place the vendored trainer in the repo first (git-ignored; move via Drive
+#    or clone the pinned version) so ./LLaMA-Factory exists.
+bash env/setup_env.sh        # creates the "trainer" conda env, deterministically
+conda activate trainer
+cp .env.example .env         # then fill in HF_KEY + paths
 ```
 
-All machine-specific paths and the HF token come from `.env` (never committed).
+`requirements.txt` holds only the lightweight deps for the helper scripts here;
+the heavy trainer stack is installed by `env/setup_env.sh`. All machine-specific
+paths and the HF token come from `.env` (never committed).
 
 ## Pipeline
 

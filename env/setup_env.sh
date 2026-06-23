@@ -24,6 +24,15 @@ PY_VER="3.11"
 REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 LOCK="$REPO_DIR/env/requirements-lock.txt"
 
+# Prerequisite: the vendored trainer must be present (it is git-ignored and
+# moved out-of-band). Fail early with a clear message rather than mid-install.
+if [ ! -f "$REPO_DIR/LLaMA-Factory/pyproject.toml" ] && [ ! -f "$REPO_DIR/LLaMA-Factory/setup.py" ]; then
+  echo "ERROR: $REPO_DIR/LLaMA-Factory not found." >&2
+  echo "Place the vendored LLaMA-Factory there first (move via Drive, or clone the" >&2
+  echo "pinned version), then re-run this script." >&2
+  exit 1
+fi
+
 # --- pinned versions (single source of truth) ---
 TORCH_PKGS="torch==2.6.0 torchvision==0.21.0 torchaudio==2.6.0"
 TORCH_INDEX="${TORCH_INDEX:-https://download.pytorch.org/whl/cu124}"
